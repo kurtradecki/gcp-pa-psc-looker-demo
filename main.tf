@@ -9,13 +9,12 @@ locals {
 }
 
 terraform {
-  required_version = ">= 1.8"
+  required_version = "~> 1.10.5"
 
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.45.2"
-      #      version = "~> 6.0.0"
+      version = "~> 6.11.2"
     }
   }
 }
@@ -24,11 +23,12 @@ terraform {
 # ===== APIs and org policies =====
 
 module "project" {
-  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v28.0.0"
+  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v36.0.0"
   name           = var.project_id
   project_create = false
   services       = var.services
 }
+
 
 # enforced / not enforced type policies
 module "bool_org_policy" {
@@ -39,7 +39,7 @@ module "bool_org_policy" {
   constraint  = "constraints/compute.${each.value}"
   policy_type = "boolean"
   enforce     = false
-  #  version     = "~> 5.0.0"
+  version     = "~> 7.0.0"
 }
 
 # allow all / deny all type org policies
@@ -51,7 +51,7 @@ module "list_org_policy" {
   constraint  = "constraints/compute.${each.value}"
   policy_type = "list"
   enforce     = false
-  #  version     = "~> 5.0.0"
+  version     = "~> 7.0.0"
 }
 
 
@@ -67,7 +67,7 @@ resource "time_sleep" "wait_60_seconds" {
 # VPCs for DC, Hub and Spoke
 module "vpc-spoke" {
   count      = var.create_vpcs ? 1 : 0
-  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v28.0.0"
+  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
   project_id = var.project_id
   name       = var.spoke_network
   subnets    = var.spoke_subnets
@@ -76,7 +76,7 @@ module "vpc-spoke" {
 
 module "vpc-hub" {
   count      = var.create_vpcs ? 1 : 0
-  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v28.0.0"
+  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
   project_id = var.project_id
   name       = var.hub_network
   subnets    = var.hub_subnets
@@ -85,7 +85,7 @@ module "vpc-hub" {
 
 module "vpc-dc" {
   count      = var.create_vpcs ? 1 : 0
-  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v28.0.0"
+  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
   project_id = var.project_id
   name       = var.dc_network
   subnets    = var.dc_subnets
@@ -113,7 +113,7 @@ resource "google_compute_network_peering" "peering-vpc2-vpc1" {
 
 # NAT for GitHub Enterprise Server to access image
 module "cldnat-ghes" {
-  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v28.0.0"
+  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v36.0.0"
   project_id     = var.project_id
   region         = var.dc_ghes_config.region
   name           = "${var.cldnat_name}-${var.dc_network}"
@@ -148,7 +148,7 @@ module "win_bastion_vm" {
 
 # NAT for GitHub Enterprise Server to access image
 module "cldnat_win_bastion" {
-  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v28.0.0"
+  source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v36.0.0"
   project_id     = var.project_id
   region         = var.bastion_config.region
   name           = "${var.cldnat_name}-${var.bastion_config.vpc}"
@@ -298,7 +298,7 @@ resource "google_compute_forwarding_rule" "forwarding-rule-https" {
 
 # DNS record for Northbound Internal Application Load Balancer
 module "private-dns" {
-  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/dns?ref=v26.0.0"
+  source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/dns?ref=v36.0.0"
   project_id = var.project_id
   name       = replace(var.svc_dns_domain, ".", "-")
   zone_config = {
@@ -343,12 +343,14 @@ resource "google_compute_address" "lb-static-ip-ext" {
 }
 
 # Cloud Armor policy to allow IPs for Northbound External Application Load Balancer
-resource "google_compute_security_policy" "cloudarmor-policy" {
-  #resource "google_compute_region_security_policy" "cloudarmor-policy" {
-  #  provider = google-beta  
+#resource "google_compute_security_policy" "cloudarmor-policy" {
+resource "google_compute_region_security_policy" "cloudarmor-policy" {
+  provider = google-beta  
   project = var.project_id
+  region  = var.region_infra
   name    = "${var.cloudarmor_policy_name_prefix}-${var.lb_name}"
-  rule {
+  type    = "CLOUD_ARMOR"
+  rules {
     action   = "allow"
     priority = "10000"
     match {
@@ -359,7 +361,7 @@ resource "google_compute_security_policy" "cloudarmor-policy" {
     }
     description = "Trusted IPs"
   }
-  rule {
+  rules {
     action   = "deny(403)"
     priority = "2147483647"
     match {
@@ -375,7 +377,7 @@ resource "google_compute_security_policy" "cloudarmor-policy" {
 
 # backend service for Northbound External Application Load Balancer
 resource "google_compute_region_backend_service" "backend-service-ext" {
-  #  provider              = google-beta
+  provider              = google-beta
   project               = var.project_id
   name                  = "${var.backend_service_name_prefix}-${var.lb_name}-ext"
   region                = var.region_infra
@@ -383,7 +385,7 @@ resource "google_compute_region_backend_service" "backend-service-ext" {
   port_name             = "https"
   load_balancing_scheme = "EXTERNAL_MANAGED"
   timeout_sec           = 3600
-  #  security_policy         = google_compute_security_policy.cloudarmor-policy.id
+  security_policy       = google_compute_region_security_policy.cloudarmor-policy.id
   backend {
     group           = google_compute_region_network_endpoint_group.psc_neg_nb.id
     balancing_mode  = "UTILIZATION"
@@ -621,6 +623,7 @@ resource "google_compute_service_attachment" "psc_sa_sb" {
 }
 
 
+
 # ======= Configure Looker to allow the VPC ======= 
 
 module "gcloud_set_prj" {
@@ -657,4 +660,3 @@ module "gcloud_looker_update_svc_attachment_uri" {
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
 }
-

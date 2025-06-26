@@ -13,7 +13,7 @@ svc_name          = "" # also becomes host in the service's FQDN
 
 
 # ===== Section 1.1 - Add values if needed to enable functionality
-ext_allowed_ips       = []  # IP(s) allowed in Cloud Armor for external LB, eg ["1.2.3.4/32","5.6.7.8/32"] leave as empty string for no external access. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
+ext_allowed_ips       = ["0.0.0.0/0"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to allow all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
 psc_sa_num            = "1" # used to quickly change the name of the Southbound PSC Service Attachment
 cert_private_key_path = ""  # path and file name of cert private key for load balancers, leave as empty string if not using a cert
 cert_path             = ""  # path and file name of cert private key for load balancers, leave as empty string if not using a cert
