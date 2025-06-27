@@ -11,9 +11,7 @@ This repo contains instructions and Terraform script to build Private Northbound
 
 
 ## Prerequisites
-1. Full access to deploy an Apigee organization & it's networking components
-2. Access to deploy API proxies on Apigee
-3. Make sure the following tools are available in your terminal's $PATH (Cloud Shell has these preconfigured)
+1. Make sure the following tools are available in your terminal's $PATH (Cloud Shell has these preconfigured)
     * [gcloud SDK](https://cloud.google.com/sdk/docs/install)
     * terraform
 
