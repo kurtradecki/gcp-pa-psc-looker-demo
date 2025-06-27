@@ -37,7 +37,7 @@ gcloud auth application-default login
 To deploy the script, follow this process:
 1. Create a project in GCP, if not already created. Reference if needed [Creating and managing projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 2. Follow these instructions to create a PSC-based Looker Core instance: [Create a Private Service Connect Looker instance](https://cloud.google.com/looker/docs/looker-core-create-psc#create_instance)
-3. Rename example.tfvars to terraform.tfvars
+3. In the gcp-pa-psc-looker-demo directory, rename example.tfvars to terraform.tfvars
 4. In terraform.tfvars, add the values for variables that need values (see the file for which). All other values can stay the same unless customization required. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 5. At the command prompt where you'll run the script, in the Terraform directory, run:
 
