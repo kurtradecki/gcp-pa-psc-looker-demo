@@ -2,7 +2,6 @@
 resource "google_compute_firewall" "allow_private_ips" {
   project = var.project_id
   name    = "fwr-allow-private-ips-${var.vpc}"
-  #  description = ""
   direction = "INGRESS"
   priority  = "1000"
   network   = var.vpc
