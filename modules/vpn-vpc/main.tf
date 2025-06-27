@@ -34,9 +34,7 @@ module "vpn-1" {
     name = "cldrtr-${data.google_compute_network.vpc1.name}-${var.vpn_config.region}-internal"
     custom_advertise = {
       all_subnets = true
-      ip_ranges = {
-        "10.0.0.0/8" = "default"
-      }
+      ip_ranges = var.vpn_config.vpc1-advertised-ranges
     }
   }
   tunnels = {
@@ -71,8 +69,7 @@ module "vpn-2" {
     name = "cldrtr-${data.google_compute_network.vpc2.name}-${var.vpn_config.region}-internal"
     custom_advertise = {
       all_subnets = true
-      ip_ranges = {
-      }
+      ip_ranges = var.vpn_config.vpc2-advertised-ranges
     }
   }
   peer_gateways = {

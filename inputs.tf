@@ -18,19 +18,14 @@ variable "svc_dns_domain" {
 variable "psc_sb_infra_config" {
   description = ""
   type = object({
-    #    project_id                     = string
-    service_type             = string
-    inet_neg_fqdn_host       = string
-    inet_neg_fqdn_domain     = string
-    serverless_instance_name = string
-    psc_neg_sa_uri           = string
-    #    region                         = string
-    #    vpc                            = string
-    psc_neg_subnet = string
-    port           = string
-    #    forwarding_rule_subnet         = string
+    service_type                   = string
+    inet_neg_fqdn_host             = string
+    inet_neg_fqdn_domain           = string
+    serverless_instance_name       = string
+    psc_neg_sa_uri                 = string
+    psc_neg_subnet                 = string
+    port                           = string
     service_attachment_nat_iprange = string
-    #    lb_proxy_only_subnet           = string
   })
 }
 
@@ -137,13 +132,19 @@ variable "spoke_network" {
 
 variable "spoke_subnets" {
   description = "Subnets"
-  type = list(object({
+  #  type = list(object({
+  type = object({
     name               = string
     ip_cidr_range      = string
-    region             = string
+    region             = optional(string, "")
     secondary_ip_range = map(string)
-  }))
-  default = []
+    flow_logs_config = object({
+      aggregation_interval = string
+      flow_sampling        = number
+      metadata             = string
+    })
+  })
+  #  }))
 }
 
 variable "hub_network" {
@@ -153,13 +154,19 @@ variable "hub_network" {
 
 variable "hub_subnets" {
   description = "Subnets"
-  type = list(object({
+  #  type = list(object({
+  type = object({
     name               = string
     ip_cidr_range      = string
-    region             = string
+    region             = optional(string, "")
     secondary_ip_range = map(string)
-  }))
-  default = []
+    flow_logs_config = object({
+      aggregation_interval = string
+      flow_sampling        = number
+      metadata             = string
+    })
+  })
+  #  }))
 }
 
 variable "dc_network" {
@@ -169,24 +176,30 @@ variable "dc_network" {
 
 variable "dc_subnets" {
   description = "Subnets"
-  type = list(object({
+  #  type = list(object({
+  type = object({
     name               = string
     ip_cidr_range      = string
-    region             = string
+    region             = optional(string, "")
     secondary_ip_range = map(string)
     flow_logs_config = object({
       aggregation_interval = string
       flow_sampling        = number
       metadata             = string
     })
-  }))
-  default = []
+  })
+  #  }))
 }
 
 variable "create_looker" {
   description = "if Looker already created (existing environment), set to false"
   type        = bool
   default     = false
+}
+
+variable "vm_zone_suffix" {
+  description = "zone suffix, eg -c, to add to the end of the region_infra value"
+  type        = string
 }
 
 variable "ghes_config" {
@@ -196,8 +209,8 @@ variable "ghes_config" {
     vpcname          = string
     subnetname       = string
     githubservername = string
-    region           = string
-    zone             = string
+    region           = optional(string, "")
+    zone             = optional(string, "")
     #    instancegroupname = string    
   })
 }
@@ -209,8 +222,8 @@ variable "dc_ghes_config" {
     vpcname          = string
     subnetname       = string
     githubservername = string
-    region           = string
-    zone             = string
+    region           = optional(string, "")
+    zone             = optional(string, "")
     #    instancegroupname = string    
   })
 }
@@ -221,19 +234,19 @@ variable "cldnat_name" {
 
 variable "vpn_config" {
   type = object({
-    region = string
-    vpc1   = string
-    #      vpc1-advertised-ranges = string
-    vpc2 = string
-    #      vpc2-advertised-ranges = string
+    region                 = optional(string, "")
+    vpc1                   = string
+    vpc1-advertised-ranges = optional(map(string), {})
+    vpc2                   = string
+    vpc2-advertised-ranges = optional(map(string), {})
   })
 }
 
 variable "bastion_config" {
   description = "Settings for bastion host"
   type = object({
-    region    = string
-    zone      = string
+    region    = optional(string, "")
+    zone      = optional(string, "")
     vm_name   = string
     vpc       = string
     subnet    = string

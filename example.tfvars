@@ -13,10 +13,11 @@ svc_name          = "" # also becomes host in the service's FQDN
 
 
 # ===== Section 1.1 - Add values if needed to enable functionality
-ext_allowed_ips       = ["0.0.0.0/0"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to allow all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
-psc_sa_num            = "1" # used to quickly change the name of the Southbound PSC Service Attachment
-cert_private_key_path = ""  # path and file name of cert private key for load balancers, leave as empty string if not using a cert
-cert_path             = ""  # path and file name of cert private key for load balancers, leave as empty string if not using a cert
+cert_private_key_path = ""             # leave as empty string if not using a cert
+cert_path             = ""             # leave as empty string if not using a cert
+ext_allowed_ips       = ["0.0.0.0/32"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
+psc_sa_num            = "1"            # used to quickly change the name of the Southbound PSC Service Attachment
+vm_zone_suffix        = "-c"           # zone suffix, eg -c, to add to the end of the region_infra value
 
 
 # ===== Section 2 - No need to change - customize below only if needed (see note above) =====
@@ -37,15 +38,14 @@ proxy_only_subnet_cidr        = "192.168.123.0/24"
 cldnat_name                   = "pubnat-gw"
 
 vpn_config = {
-  region = "us-east1"
-  vpc1   = "vpc-hub"
-  #  vpc1-advertised-ranges = ""
+  vpc1 = "vpc-hub"
+  vpc1-advertised-ranges = {
+    "10.0.0.0/8" = "default"
+  }
   vpc2 = "vpc-dc"
-  #  vpc2-advertised-ranges = ""
 }
 
 bastion_config = {
-  region    = "us-east1"
   zone      = "us-east1-d"
   vm_name   = "windows-srvr-2022-bastion"
   vpc       = "vpc-spoke"
@@ -59,7 +59,6 @@ ghes_config = {
   vpcname          = "vpc-spoke"
   subnetname       = "subnet-spoke-us-east1"
   githubservername = "ghes-vm"
-  region           = "us-east1"
   zone             = "us-east1-b"
   #  instancegroupname = "instance-group-1"
 }
@@ -69,106 +68,58 @@ dc_ghes_config = {
   vpcname          = "vpc-dc"
   subnetname       = "subnet-dc-us-east1"
   githubservername = "dc-ghes-vm"
-  region           = "us-east1"
   zone             = "us-east1-b"
   #  instancegroupname = "instance-group-1"
 }
 
 psc_sb_infra_config = {
-  #  project_id   = "prj-lookercore-network-testing"
-  service_type = "inet-neg" # either "inet-neg", "serverless-neg", or "psc-neg"
-  # replace all the strings below with one string called service_string and explain what it is
-  inet_neg_fqdn_host       = "www"        # leave blank if no Internet NEG
-  inet_neg_fqdn_domain     = "github.com" # leave blank if no Internet NEG"
-  serverless_instance_name = ""           # leave blank if no serverless NEG
-  psc_neg_sa_uri           = ""
-  psc_neg_subnet           = "" # for PSC NEG only, can leave blank otherwise
-  #  region                         = "us-east1"
-  #  vpc                            = "vpc-spoke"
-  port = 22
-  #  forwarding_rule_subnet         = "subnet-spoke-us-east1"
+  service_type                   = "inet-neg"   # either "inet-neg" or "psc-neg"
+  inet_neg_fqdn_host             = ""           # leave blank if Internet NEG referencing only the domain as the FQDN, or if no Internet NEG
+  inet_neg_fqdn_domain           = "github.com" # leave blank if no Internet NEG"
+  serverless_instance_name       = ""           # leave blank if no serverless NEG
+  psc_neg_sa_uri                 = ""
+  psc_neg_subnet                 = "" # for PSC NEG only, can leave blank otherwise
+  port                           = 22
   service_attachment_nat_iprange = "10.231.0.0/24"
-  #  lb_proxy_only_subnet           = "192.168.123.0/24"
 }
 
 # VPCs / subnets config
 spoke_network = "vpc-spoke"
-spoke_subnets = [
-  {
-    name               = "subnet-spoke-us-central1"
-    ip_cidr_range      = "10.100.1.0/24"
-    region             = "us-central1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
-  },
-  {
-    name               = "subnet-spoke-us-east1"
-    ip_cidr_range      = "10.101.1.0/24"
-    region             = "us-east1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
+spoke_subnets = {
+  name               = "subnet-spoke-us-east1"
+  ip_cidr_range      = "10.101.1.0/24"
+  secondary_ip_range = null
+  flow_logs_config = {
+    flow_sampling        = 1.0
+    aggregation_interval = "INTERVAL_5_SEC"
+    metadata             = "INCLUDE_ALL_METADATA"
   }
-]
+}
+
 
 hub_network = "vpc-hub"
-hub_subnets = [
-  {
-    name               = "subnet-hub-us-central1"
-    ip_cidr_range      = "10.10.1.0/24"
-    region             = "us-central1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
-  },
-  {
-    name               = "subnet-hub-us-east1"
-    ip_cidr_range      = "10.11.1.0/24"
-    region             = "us-east1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
+hub_subnets = {
+  name               = "subnet-hub-us-east1"
+  ip_cidr_range      = "10.11.1.0/24"
+  secondary_ip_range = null
+  flow_logs_config = {
+    flow_sampling        = 1.0
+    aggregation_interval = "INTERVAL_5_SEC"
+    metadata             = "INCLUDE_ALL_METADATA"
   }
-]
+}
 
 dc_network = "vpc-dc"
-dc_subnets = [
-  {
-    name               = "subnet-dc-us-central1"
-    ip_cidr_range      = "172.16.1.0/24"
-    region             = "us-central1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
-  },
-  {
-    name               = "subnet-dc-us-east1"
-    ip_cidr_range      = "172.17.1.0/24"
-    region             = "us-east1"
-    secondary_ip_range = null
-    flow_logs_config = {
-      flow_sampling        = 1.0
-      aggregation_interval = "INTERVAL_5_SEC"
-      metadata             = "INCLUDE_ALL_METADATA"
-    }
+dc_subnets = {
+  name               = "subnet-dc-us-east1"
+  ip_cidr_range      = "172.17.1.0/24"
+  secondary_ip_range = null
+  flow_logs_config = {
+    flow_sampling        = 1.0
+    aggregation_interval = "INTERVAL_5_SEC"
+    metadata             = "INCLUDE_ALL_METADATA"
   }
-]
+}
 
 # ===== APIs and org policies
 services = ["compute.googleapis.com",
