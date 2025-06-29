@@ -6,18 +6,18 @@
 
 # ===== Section 1 - Add values here =====
 project_id        = ""
-svc_instance_name = "" # name of the service instance 
+svc_instance_name = ""                                                                                       # name of the service instance 
 svc_sa            = "" # service instance PSC service attachment
-svc_dns_domain    = "" # domain used by the service instance
-svc_name          = "" # also becomes host in the service's FQDN
+svc_dns_domain    = ""                                                                                                       # domain used by the service instance
+svc_name          = ""                                                                                                             # also becomes host in the service's FQDN
 
 
 # ===== Section 1.1 - Add values if needed to enable functionality
-cert_private_key_path = ""             # leave as empty string if not using a cert
-cert_path             = ""             # leave as empty string if not using a cert
-ext_allowed_ips       = ["0.0.0.0/32"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
-psc_sa_num            = "1"            # used to quickly change the name of the Southbound PSC Service Attachment
-vm_zone_suffix        = "-c"           # zone suffix, eg -c, to add to the end of the region_infra value
+cert_private_key_path = "" # leave as empty string if not using a cert
+cert_path             = "" # leave as empty string if not using a cert
+ext_allowed_ips       = ["0.0.0.0/32"]                                                                                                                              # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
+psc_sa_num            = "1"                                                                                                                                         # used to quickly change the name of the Southbound PSC Service Attachment
+vm_zone_suffix        = "-c"                                                                                                                                        # zone suffix, eg -c, to add to the end of the region_infra value
 
 
 # ===== Section 2 - No need to change - customize below only if needed (see note above) =====
