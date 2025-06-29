@@ -19,10 +19,10 @@ See the architecture images for more details...
 ![Southbound architecture](./images/LookerSBArch.png)
 
 ## Notes
-* The intent of this repo is to create a fixed, isolated environment for learning, demonstration and Proof of Concept (PoC), **not production**.
-* The Terraform script set to not enforced the [Google Cloud org policies](https://cloud.google.com/resource-manager/docs/organization-policy/using-constraints) constraints/compute.requireShieldedVm and disableInternetNetworkEndpointGroup at the project level, and allows all for org policies trustedImageProjects and restrictVpnPeerIPs at the project level, so the script may not be appropriate for highly regulated environments.
-* The actions taken by deploying this repo will add cost. To minimize costs, instructions are provided for how to teardown the demo environment when you're finished using it. For more on cost, please refer to Google Cloud public pricing pages for components such as Internal and External Load Balancers, Private Service Connect, Reserved IP Addresses, Data Transfer, Certificate Manager, etc.
-* There are 3 gcloud commands run in the Terraform script since there is no Terraform equivalent of these commands without creating Looker from Terraform (something this script does not do). All 3 commands are based on [gcloud looker instances update](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update) and do the following: 1) [Update VPCs allowed to reach Looker Core northbound](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--psc-allowed-vpcs), 2) [Update DNS and PSC Service Attachment URI in Looker VPC for Southbound](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--psc-service-attachment), 3) [Update customer domain for Looker Core](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--custom-domain) (see [custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2) for more information).
+1. The intent of this repo is to create a fixed, isolated environment for learning, demonstration and Proof of Concept (PoC), **not production**.
+2. The Terraform script set to not enforced the [Google Cloud org policies](https://cloud.google.com/resource-manager/docs/organization-policy/using-constraints) constraints/compute.requireShieldedVm and disableInternetNetworkEndpointGroup at the project level, and allows all for org policies trustedImageProjects and restrictVpnPeerIPs at the project level, so the script may not be appropriate for highly regulated environments.
+3. The actions taken by deploying this repo will add cost. To minimize costs, instructions are provided for how to teardown the demo environment when you're finished using it. For more on cost, please refer to Google Cloud public pricing pages for components such as Internal and External Load Balancers, Private Service Connect, Reserved IP Addresses, Data Transfer, Certificate Manager, etc.
+4. There are 3 gcloud commands run in the Terraform script since there is no Terraform equivalent of these commands without creating Looker from Terraform (something this script does not do). All 3 commands are based on [gcloud looker instances update](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update) and do the following: 1) [Update VPCs allowed to reach Looker Core northbound](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--psc-allowed-vpcs), 2) [Update DNS and PSC Service Attachment URI in Looker VPC for Southbound](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--psc-service-attachment), 3) [Update customer domain for Looker Core](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update#--custom-domain) (see [custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2) for more information).
 
 
 ## Prerequisites
@@ -30,6 +30,13 @@ See the architecture images for more details...
     * [gcloud SDK](https://cloud.google.com/sdk/docs/install)
     * terraform
 2. Must be using Terraform **version 1.10 or above**
+3. Project-level permissions needed to run the script:\
+   a. Permission: serviceusage.services.enable. Role: Service Usage Admin (roles/serviceusage.serviceUsageAdmin)\
+   b. Permission: compute.networks.create. Role: Compute Network Admin (roles/compute.networkAdmin)\
+   c. Permissions: compute.regionNetworkEndpointGroups.create, compute.firewalls.create, compute.disks.create, compute.instances.create. Role: Compute Admin (roles/compute.admin)\
+   d. Permission: looker.instances.update. Role: Looker Admin (roles/looker.admin)\
+4. Org-level permissions needed to run the script: Organization Policy Administrator (roles/orgpolicy.policyAdmin) 
+5. 
 
 ## Setup and Deploy the script
 
