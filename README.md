@@ -63,6 +63,13 @@ terraform apply -auto-approve
 8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.\
 Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete." From [Create a custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2)
 
+## Troubleshooting
+
+Most errors in this Terraform script can be cleared by running the 'terraform plan' and 'terraform apply -auto-approve' again. 
+
+gcloud commands in Terraform can at times return a long error message that includes the following error: "local-exec provisioner error" and "unable to queue operation since queue fifo_queue is full according to queue". Same as mentioned, re-running the terraform commands 'terraform plan' and 'terraform apply -auto-approve' will clear the error. 
+
+
 ## Conclusion & Cleanup
 
 Congratulations! You've successfully deployed the script.
