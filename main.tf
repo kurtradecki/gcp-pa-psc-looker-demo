@@ -1,3 +1,18 @@
+/**
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 locals {
   boolorgpols_map   = { for index, boolorgpol in var.boolorgpols : "${index}" => boolorgpol }
@@ -229,6 +244,7 @@ resource "google_compute_region_network_endpoint_group" "psc_neg_nb" {
 
 # cert for Northbound Internal Application Load Balancer
 resource "google_compute_region_ssl_certificate" "cert" {
+  count       = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project     = var.project_id
   region      = var.region_infra
   name_prefix = "cert-${var.svc_name}-nb"
@@ -248,6 +264,7 @@ resource "google_compute_region_ssl_certificate" "cert" {
 
 # create static internal IP address used to reach the load balancer
 resource "google_compute_address" "lb-static-ip" {
+  count        = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project      = var.project_id
   region       = var.region_infra
   name         = "${var.lb_static_ip_name_prefix}-${var.lb_name}"
@@ -259,6 +276,7 @@ resource "google_compute_address" "lb-static-ip" {
 
 # backend service for Northbound Internal Application Load Balancer
 resource "google_compute_region_backend_service" "backend-service" {
+  count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project               = var.project_id
   name                  = "${var.backend_service_name_prefix}-${var.lb_name}"
   region                = var.region_infra
@@ -276,25 +294,28 @@ resource "google_compute_region_backend_service" "backend-service" {
 
 # url map for Northbound Internal Application Load Balancer
 resource "google_compute_region_url_map" "url-map" {
+  count           = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project         = var.project_id
   name            = var.lb_name
   region          = var.region_infra
-  default_service = google_compute_region_backend_service.backend-service.id
+  default_service = google_compute_region_backend_service.backend-service[0].id
   depends_on      = [time_sleep.wait_60_seconds]
 }
 
 # https proxy for Northbound Internal Application Load Balancer
 resource "google_compute_region_target_https_proxy" "proxy-https" {
+  count            = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project          = var.project_id
   name             = "${var.lb_https_proxy_name_prefix}-${var.lb_name}"
   region           = var.region_infra
-  url_map          = google_compute_region_url_map.url-map.id
-  ssl_certificates = [google_compute_region_ssl_certificate.cert.id]
+  url_map          = google_compute_region_url_map.url-map[0].id
+  ssl_certificates = [google_compute_region_ssl_certificate.cert[0].id]
   depends_on       = [time_sleep.wait_60_seconds]
 }
 
 # https forwarding rule for Northbound Internal Application Load Balancer 
 resource "google_compute_forwarding_rule" "forwarding-rule-https" {
+  count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project               = var.project_id
   name                  = "${var.forwarding_rule_name_prefix}-https-${var.lb_name}"
   region                = var.region_infra
@@ -302,14 +323,15 @@ resource "google_compute_forwarding_rule" "forwarding-rule-https" {
   load_balancing_scheme = "INTERNAL_MANAGED"
   port_range            = "443"
   network               = var.vpc_infra
-  target                = google_compute_region_target_https_proxy.proxy-https.id
-  ip_address            = google_compute_address.lb-static-ip.id
+  target                = google_compute_region_target_https_proxy.proxy-https[0].id
+  ip_address            = google_compute_address.lb-static-ip[0].id
   subnetwork            = var.subnet_infra
   depends_on            = [time_sleep.wait_60_seconds, google_compute_subnetwork.proxy-subnet-for-lbs]
 }
 
 # DNS record for Northbound Internal Application Load Balancer
 module "private-dns" {
+  count      = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/dns?ref=v36.0.0"
   project_id = var.project_id
   name       = replace(var.svc_dns_domain, ".", "-")
@@ -320,7 +342,7 @@ module "private-dns" {
     }
   }
   recordsets = {
-    "A ${var.svc_name}" = { records = [google_compute_address.lb-static-ip.address] }
+    "A ${var.svc_name}" = { records = [google_compute_address.lb-static-ip[0].address] }
   }
   depends_on = [time_sleep.wait_60_seconds, module.vpc-spoke]
 }
@@ -332,6 +354,7 @@ module "private-dns" {
 
 # static external IP address for Northbound External Application Load Balancer
 resource "google_compute_address" "lb-static-ip-ext" {
+  count        = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project      = var.project_id
   region       = var.region_infra
   name         = "${var.lb_static_ip_name_prefix}-${var.lb_name}-ext"
@@ -342,6 +365,7 @@ resource "google_compute_address" "lb-static-ip-ext" {
 
 # Cloud Armor policy to allow IPs for Northbound External Application Load Balancer
 resource "google_compute_region_security_policy" "cloudarmor-policy" {
+  count    = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   provider = google-beta
   project  = var.project_id
   region   = var.region_infra
@@ -374,6 +398,7 @@ resource "google_compute_region_security_policy" "cloudarmor-policy" {
 
 # backend service for Northbound External Application Load Balancer
 resource "google_compute_region_backend_service" "backend-service-ext" {
+  count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   provider              = google-beta
   project               = var.project_id
   name                  = "${var.backend_service_name_prefix}-${var.lb_name}-ext"
@@ -382,7 +407,7 @@ resource "google_compute_region_backend_service" "backend-service-ext" {
   port_name             = "https"
   load_balancing_scheme = "EXTERNAL_MANAGED"
   timeout_sec           = 3600
-  security_policy       = google_compute_region_security_policy.cloudarmor-policy.id
+  security_policy       = google_compute_region_security_policy.cloudarmor-policy[0].id
   backend {
     group           = google_compute_region_network_endpoint_group.psc_neg_nb.id
     balancing_mode  = "UTILIZATION"
@@ -393,25 +418,28 @@ resource "google_compute_region_backend_service" "backend-service-ext" {
 
 # url map for Northbound External Application Load Balancer
 resource "google_compute_region_url_map" "url-map-ext" {
+  count           = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project         = var.project_id
   name            = "${var.lb_name}-ext"
   region          = var.region_infra
-  default_service = google_compute_region_backend_service.backend-service-ext.id
+  default_service = google_compute_region_backend_service.backend-service-ext[0].id
   depends_on      = [time_sleep.wait_60_seconds]
 }
 
 # https proxy for Northbound External Application Load Balancer
 resource "google_compute_region_target_https_proxy" "proxy-https-ext" {
+  count            = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project          = var.project_id
   name             = "${var.lb_https_proxy_name_prefix}-${var.lb_name}-ext"
   region           = var.region_infra
-  url_map          = google_compute_region_url_map.url-map-ext.id
-  ssl_certificates = [google_compute_region_ssl_certificate.cert.id]
+  url_map          = google_compute_region_url_map.url-map-ext[0].id
+  ssl_certificates = [google_compute_region_ssl_certificate.cert[0].id]
   depends_on       = [time_sleep.wait_60_seconds]
 }
 
 # https forwarding rule for Northbound External Application Load Balancer
 resource "google_compute_forwarding_rule" "forwarding-rule-https-ext" {
+  count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   project               = var.project_id
   name                  = "${var.forwarding_rule_name_prefix}-https-${var.lb_name}-ext"
   region                = var.region_infra
@@ -419,8 +447,8 @@ resource "google_compute_forwarding_rule" "forwarding-rule-https-ext" {
   load_balancing_scheme = "EXTERNAL_MANAGED"
   port_range            = "443"
   network               = var.vpc_infra
-  target                = google_compute_region_target_https_proxy.proxy-https-ext.id
-  ip_address            = google_compute_address.lb-static-ip-ext.id
+  target                = google_compute_region_target_https_proxy.proxy-https-ext[0].id
+  ip_address            = google_compute_address.lb-static-ip-ext[0].id
   depends_on            = [time_sleep.wait_60_seconds, google_compute_subnetwork.proxy-subnet-for-lbs]
 }
 
@@ -626,6 +654,17 @@ module "gcloud_looker_update_svc_attachment_uri" {
   platform               = "linux"
   create_cmd_entrypoint  = "gcloud"
   create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --psc-service-attachment domain=${var.psc_sb_infra_config.inet_neg_fqdn_domain},attachment=${google_compute_service_attachment.psc_sa_sb.self_link} --quiet"
+  destroy_cmd_entrypoint = ""
+  destroy_cmd_body       = ""
+  module_depends_on      = [google_compute_forwarding_rule.fr_sb]
+}
+
+module "gcloud_looker_update_nb_custom_domain" {
+  source                 = "terraform-google-modules/gcloud/google"
+  version                = "~> 3.5"
+  platform               = "linux"
+  create_cmd_entrypoint  = "gcloud"
+  create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --custom-domain=${var.svc_name}.${var.svc_dns_domain} --quiet"
   destroy_cmd_entrypoint = ""
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
