@@ -10,7 +10,12 @@ See the architecture images for more details.
 **Northbound Architecture - Option #1 - 1 Load balancer 
 Internal network proxy load balancer only, no cert provided, no TLS termination on load balancer**
 ![Northbound architecture option 1](./images/LookerNBArchOpt1.png)
+
+**Northbound Architecture - Option #2 - 3 Load balancers
+Must add trusted cert for Application load balancers to be created**
 ![Northbound architecture option 2](./images/LookerNBArchOpt2.png)
+
+**Southbound Architecture**
 ![Southbound architecture](./images/LookerSBArch.png)
 
 ## Notes
