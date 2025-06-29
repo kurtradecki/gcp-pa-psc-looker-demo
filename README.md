@@ -1,7 +1,7 @@
 # Private Access to Looker Core Northbound and Southbound
 This repo contains instructions and a Terraform script to build Private Northbound and Private Southbound networking for Looker Core in an isolated Google Cloud environment. 
 
-The script builds Northbound architecture with 1 or 3 load balancers depending if the path to the cert file and private key are added to the tfvars files (instructions below).  
+The script builds Northbound architecture with 1 or 3 load balancers depending if the path to a cert file and private key are added to the tfvars files (instructions below).  
 
 The script builds Southbound architecture with a single Internal network proxy load balancer for Looker Core to reach Git services via SSH.
 
