@@ -34,11 +34,9 @@ See the architecture images for more details...
 
 To deploy the script, follow this process:
 1. Clone the this repo to your machine
-
 ```sh
 git clone https://github.com/kurtradecki/gcp-pa-psc-looker-demo.git
 ```
-
 2. Ensure you have an active GCP account selected to run gcloud commands with [gcloud CLI](https://cloud.google.com/sdk/docs/install) (not needed in Cloud Shell).
 
 ```sh
