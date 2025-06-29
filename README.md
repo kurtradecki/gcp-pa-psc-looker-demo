@@ -27,7 +27,7 @@ See the architecture images for more details...
 
 ## Prerequisites
 1. Make sure the following tools are available in your terminal's $PATH (Cloud Shell has these preconfigured)
-    * [gcloud SDK](https://cloud.google.com/sdk/docs/install)
+    * [gcloud CLI SDK](https://cloud.google.com/sdk/docs/install)
     * terraform
 2. Must be using Terraform **version 1.10 or above**
 3. Project-level permissions needed to run the script:\
@@ -45,7 +45,7 @@ To deploy the script, follow this process:
 ```sh
 git clone https://github.com/kurtradecki/gcp-pa-psc-looker-demo.git
 ```
-2. Ensure you have an active GCP account selected to run gcloud commands with [gcloud CLI](https://cloud.google.com/sdk/docs/install) (not needed in Cloud Shell).
+2. Ensure you have an active GCP account selected to run gcloud commands with [gcloud CLI SDK](https://cloud.google.com/sdk/docs/install) (not needed in Cloud Shell).
 ```sh
 gcloud auth login
 gcloud auth application-default login
