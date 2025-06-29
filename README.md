@@ -7,7 +7,7 @@ The script builds Southbound architecture with a single Internal network proxy l
 
 See the architecture images for more details...
 
-**Northbound Architecture - Option #1 - 1 Load balancer**
+**Northbound Architecture - Option #1 - 1 Load balancer**\
 **Internal network proxy load balancer only, no cert provided, no TLS termination on load balancer**
 ![Northbound architecture option 1](./images/LookerNBArchOpt1.png)
 
