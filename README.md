@@ -60,3 +60,15 @@ terraform plan
 terraform apply -auto-approve
 ```
 8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.
+
+## Conclusion & Cleanup
+
+Congratulations! You've successfully deployed the script.
+
+To delete the created infrastructure, run the following command:
+
+```sh
+terraform destroy -auto-approve
+```
+
+Wait a few minutes for the components created by the Terraform script to be removed. You'll see a message similar to "Destroy complete!" 
