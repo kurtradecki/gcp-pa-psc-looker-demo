@@ -1,8 +1,9 @@
 # Private Access to Looker Core Northbound and Southbound
 This repo contains instructions and Terraform script to build Private Northbound and Private Southbound networking for Looker Core in an isolated Google Cloud environment.
 
-![Northbound architecture](./LookerNBArch.png)
-![Southbound architecture](./LookerSBArch.png)
+![Northbound architecture option 1](./images/LookerNBArchOpt1.png)
+![Northbound architecture option 2](./images/LookerNBArchOpt2.png)
+![Southbound architecture](./images/LookerSBArch.png)
 
 ## Notes
 * The intent of this repo is to create a fixed, isolated environment for learning, demonstration and Proof of Concept (PoC), **not production**.
