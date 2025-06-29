@@ -65,9 +65,9 @@ Note: Most of the time for the script to run is updating Looker Core custom doma
 
 ## Troubleshooting
 
-Most errors in this Terraform script can be cleared by running the 'terraform plan' and 'terraform apply -auto-approve' again. 
+Most errors in this Terraform script can be cleared by running the `terraform plan` and `terraform apply -auto-approve` again. 
 
-gcloud commands in Terraform can at times return a long error message that includes the following error: "local-exec provisioner error" and "unable to queue operation since queue fifo_queue is full according to queue". Same as mentioned, re-running the terraform commands 'terraform plan' and 'terraform apply -auto-approve' will clear the error. 
+gcloud commands in Terraform can at times return a long error message that includes the following error: "local-exec provisioner error" and "unable to queue operation since queue fifo_queue is full according to queue". Same as mentioned, re-running the terraform commands `terraform plan` and `terraform apply -auto-approve` will clear the error. 
 
 
 ## Conclusion & Cleanup
