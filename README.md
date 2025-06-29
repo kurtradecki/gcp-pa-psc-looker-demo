@@ -22,7 +22,7 @@ See the architecture images for more details...
 * The intent of this repo is to create a fixed, isolated environment for learning, demonstration and Proof of Concept (PoC), **not production**.
 * The Terraform script disables (not enforced) the [Google Cloud org policies](https://cloud.google.com/resource-manager/docs/organization-policy/using-constraints) constraints/compute.requireShieldedVm and disableInternetNetworkEndpointGroup at the project level, and allows all for org policies trustedImageProjects and restrictVpnPeerIPs at the project level, so the script may not be appropriate for highly regulated environments.
 * The actions taken by deploying this repo will add cost. To minimize costs, instructions are provided for how to teardown the demo environment when you're finished using it. For more on cost, please refer to Google Cloud public pricing pages for components such as Internal and External Load Balancers, Private Service Connect, Reserved IP Addresses, Data Transfer, Certificate Manager, etc.
-* There are 3 gcloud commands run in the Terraform script since there is no Terraform equivalent of these commands without creating Looker from Terraform (something this script does not do). All 3 commands are based on [gcloud looker instances update](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update) and do the following: 1) Update VPCs allowed to reach Looker Core northbound, 2) Update DNS and PSC Service Attachment URI in Looker VPC for Southbound, 3) Update custom domain in Looker Core.
+* There are 3 gcloud commands run in the Terraform script since there is no Terraform equivalent of these commands without creating Looker from Terraform (something this script does not do). All 3 commands are based on [gcloud looker instances update](https://cloud.google.com/sdk/gcloud/reference/looker/instances/update) and do the following: 1) Update VPCs allowed to reach Looker Core northbound, 2) Update DNS and PSC Service Attachment URI in Looker VPC for Southbound, 3) Update [custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2) in Looker Core.
 
 
 ## Prerequisites
@@ -61,7 +61,7 @@ terraform plan
 terraform apply -auto-approve
 ```
 8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.\
-Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete." From https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2
+Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete." From [Create a custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2)
 
 ## Conclusion & Cleanup
 
