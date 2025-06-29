@@ -60,7 +60,8 @@ terraform init
 terraform plan
 terraform apply -auto-approve
 ```
-8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.
+8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.\
+Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete." From https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2
 
 ## Conclusion & Cleanup
 
