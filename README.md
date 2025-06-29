@@ -34,9 +34,9 @@ See the architecture images for more details...
    a. Permission: serviceusage.services.enable. Role: Service Usage Admin (roles/serviceusage.serviceUsageAdmin)\
    b. Permission: compute.networks.create. Role: Compute Network Admin (roles/compute.networkAdmin)\
    c. Permissions: compute.regionNetworkEndpointGroups.create, compute.firewalls.create, compute.disks.create, compute.instances.create. Role: Compute Admin (roles/compute.admin)\
-   d. Permission: looker.instances.update. Role: Looker Admin (roles/looker.admin)\
-4. Org-level permissions needed to run the script: Organization Policy Administrator (roles/orgpolicy.policyAdmin) 
-5. 
+   d. Permission: looker.instances.update. Role: Looker Admin (roles/looker.admin)
+4. Org-level permissions needed to run the script: Organization Policy Administrator (roles/orgpolicy.policyAdmin)
+
 
 ## Setup and Deploy the script
 
