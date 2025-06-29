@@ -45,7 +45,7 @@ gcloud auth application-default login
 3. Create a project in GCP, if not already created. Reference if needed [Creating and managing projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 4. Follow these instructions to create a PSC-based Looker Core instance: [Create a Private Service Connect Looker instance](https://cloud.google.com/looker/docs/looker-core-create-psc#create_instance)
 5. In the gcp-pa-psc-looker-demo directory, rename example.tfvars to terraform.tfvars
-6. Capture the following information for the terraform.tfvars file:
+6. Capture the following information for the terraform.tfvars file:\
    a. Project ID\
    b. Looker Core instance name\
    c. Looker Core PSC service attachment URI\
