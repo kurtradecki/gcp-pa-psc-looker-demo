@@ -27,7 +27,8 @@ See the architecture images for more details...
 ## Prerequisites
 1. Make sure the following tools are available in your terminal's $PATH (Cloud Shell has these preconfigured)
     * [gcloud SDK](https://cloud.google.com/sdk/docs/install)
-    * terraform **version 1.10 or above**
+    * terraform
+2. Must be using Terraform **version 1.10 or above**
 
 ## Setup instructions
 
