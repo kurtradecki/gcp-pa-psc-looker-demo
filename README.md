@@ -46,9 +46,11 @@ gcloud auth application-default login
 4. Follow these instructions to create a PSC-based Looker Core instance: [Create a Private Service Connect Looker instance](https://cloud.google.com/looker/docs/looker-core-create-psc#create_instance)
 5. In the gcp-pa-psc-looker-demo directory, rename example.tfvars to terraform.tfvars
 6. Capture the following information for the terraform.tfvars file:\
-   a. Project ID\
-   b. Looker Core instance name\
-   c. Looker Core PSC service attachment URI\
+   a. Project ID (project_id)\
+   b. Looker Core instance name (svc_instance_name)\
+   c. Looker Core PSC service attachment URI (svc_sa)\
+   d. FQDN / Custom Domain for Looker Core (svc_name & svc_dns_domain)\
+   e. Cert file path and cert private key file path if you plan to add a cert (cert_path & cert_private_key_path)\
 8. In terraform.tfvars, add the values for variables that need values (see the file for which). All other values can stay the same unless customization required. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 9. At the command prompt where you'll run the script, in the Terraform directory, run:
 ```sh 
