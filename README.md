@@ -5,7 +5,7 @@ The script builds Northbound architecture with 1 or 3 load balancers depending i
 
 The script builds Southbound architecture with a single Internal network proxy load balancer for Looker Core to reach Git services via SSH.
 
-See the architecture images for more details.
+See the architecture images for more details...
 
 **Northbound Architecture - Option #1 - 1 Load balancer 
 Internal network proxy load balancer only, no cert provided, no TLS termination on load balancer**
