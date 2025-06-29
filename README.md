@@ -29,7 +29,7 @@ See the architecture images for more details...
 1. Make sure the following tools are available in your terminal's $PATH ([Cloud Shell](https://cloud.google.com/shell/docs/how-cloud-shell-works) has these preconfigured)
     * [gcloud CLI SDK](https://cloud.google.com/sdk/docs/install)
     * terraform
-2. Must be using Terraform **version 1.10 or above**. If needed, upgrade instructions here: https://www.tecmint.com/install-terraform-in-linux/
+2. Must be using Terraform **version 1.10 or above**. Run the `terraform --version` command to verify version. If needed, upgrade instructions here: https://www.tecmint.com/install-terraform-in-linux/
 3. Project-level permissions needed to run the script:\
    a. Permission: serviceusage.services.enable. Role: Service Usage Admin (roles/serviceusage.serviceUsageAdmin)\
    b. Permission: compute.networks.create. Role: Compute Network Admin (roles/compute.networkAdmin)\
