@@ -19,6 +19,10 @@ variable "project_id" {
   type        = string
 }
 
+variable "looker_project_id" {
+  type = string
+}
+
 variable "psc_sa_num" {
   type = string
 }
