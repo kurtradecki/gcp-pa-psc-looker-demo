@@ -23,7 +23,7 @@ locals {
 }
 
 terraform {
-  required_version = "~> 1.10.5"
+  required_version = "~> 1.10"
 
   required_providers {
     google = {
