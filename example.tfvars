@@ -22,6 +22,7 @@
 
 # ===== Section 1 - Add values here =====
 project_id        = ""
+looker_project_id = "" # can be the same as project_id
 svc_instance_name = "" # name of the service instance 
 svc_sa            = "" # service instance PSC service attachment
 svc_dns_domain    = "" # domain used by the service instance
