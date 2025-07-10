@@ -54,12 +54,13 @@ gcloud auth application-default login
 4. Follow these instructions to create a PSC-based Looker Core instance: [Create a Private Service Connect Looker instance](https://cloud.google.com/looker/docs/looker-core-create-psc#create_instance)
 5. In the gcp-pa-psc-looker-demo directory, rename example.tfvars to terraform.tfvars
 6. Capture the following information for the terraform.tfvars file:\
-   a. Project ID (project_id)\
-   b. Looker Core instance name (svc_instance_name)\
-   c. Looker Core PSC service attachment URI (svc_sa)\
-   d. FQDN / Custom Domain for Looker Core (svc_name & svc_dns_domain)\
-   e. If you plan to add a cert for application load balancers, the cert file path and cert private key file path (cert_path & cert_private_key_path)\
-   f. If you plan to add a cert for an external application load balancer, Public IPs to allow through Cloud Armor for External application load balancer 
+   a. Infrastructure Project ID (infra_project_id)\
+   b. Looker Project ID (looker_project_id)\
+   c. Looker Core instance name (svc_instance_name)\
+   d. Looker Core PSC service attachment URI (svc_sa)\
+   e. FQDN / Custom Domain for Looker Core (svc_name & svc_dns_domain)\
+   f. If you plan to add a cert for application load balancers, the cert file path and cert private key file path (cert_path & cert_private_key_path)\
+   g. If you plan to add a cert for an external application load balancer, Public IPs to allow through Cloud Armor for External application load balancer 
 8. In terraform.tfvars, add the values for variables that need values (see the file for which). All other values can stay the same unless customization required. Reference if needed for how to find project ID, see [Find the project name, number, and ID](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
 9. At the command prompt where you'll run the script, in the Terraform directory, run:
 ```sh 
