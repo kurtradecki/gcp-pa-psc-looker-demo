@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-variable "project_id" {
+variable "infra_project_id" {
   description = "Project id"
   type        = string
 }
@@ -29,6 +29,10 @@ variable "psc_sa_num" {
 
 variable "svc_name" {
   type = string
+}
+
+variable "set_looker_custom_domain" {
+  type = bool
 }
 
 variable "svc_dns_domain" {

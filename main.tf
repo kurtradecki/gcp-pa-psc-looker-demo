@@ -17,7 +17,7 @@
 locals {
   boolorgpols_map   = { for index, boolorgpol in var.boolorgpols : "${index}" => boolorgpol }
   listorgpols_map   = { for index, listorgpol in var.listorgpols : "${index}" => listorgpol }
-  vpc_uri           = "projects/${var.looker_project_id}/global/networks/${var.vpc_infra}"
+  vpc_uri           = "projects/${var.infra_project_id}/global/networks/${var.vpc_infra}"
   service_type_psc  = "psc-neg"
   service_type_inet = "inet-neg"
 }
@@ -38,7 +38,7 @@ terraform {
 
 module "project" {
   source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/project?ref=v36.0.0"
-  name           = var.project_id
+  name           = var.infra_project_id
   project_create = false
   services       = var.services
 }
@@ -49,7 +49,7 @@ module "bool_org_policy" {
   source      = "terraform-google-modules/org-policy/google"
   for_each    = local.boolorgpols_map
   policy_for  = "project"
-  project_id  = var.project_id
+  project_id  = var.infra_project_id
   constraint  = "constraints/compute.${each.value}"
   policy_type = "boolean"
   enforce     = false
@@ -61,7 +61,7 @@ module "list_org_policy" {
   source      = "terraform-google-modules/org-policy/google"
   for_each    = local.listorgpols_map
   policy_for  = "project"
-  project_id  = var.project_id
+  project_id  = var.infra_project_id
   constraint  = "constraints/compute.${each.value}"
   policy_type = "list"
   enforce     = false
@@ -82,7 +82,7 @@ resource "time_sleep" "wait_60_seconds" {
 module "vpc-spoke" {
   count      = var.create_vpcs ? 1 : 0
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   name       = var.spoke_network
   subnets = [merge(var.spoke_subnets, {
     region = var.region_infra
@@ -93,7 +93,7 @@ module "vpc-spoke" {
 module "vpc-hub" {
   count      = var.create_vpcs ? 1 : 0
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   name       = var.hub_network
   subnets = [merge(var.hub_subnets, {
     region = var.region_infra
@@ -104,7 +104,7 @@ module "vpc-hub" {
 module "vpc-dc" {
   count      = var.create_vpcs ? 1 : 0
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-vpc?ref=v36.0.0"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   name       = var.dc_network
   subnets = [merge(var.dc_subnets, {
     region = var.region_infra
@@ -115,8 +115,8 @@ module "vpc-dc" {
 # VPC Peering from Hub to Spoke
 resource "google_compute_network_peering" "peering-vpc1-vpc2" {
   name                 = "peering-${var.hub_network}-${var.spoke_network}"
-  network              = "projects/${var.project_id}/global/networks/${var.hub_network}"
-  peer_network         = "projects/${var.project_id}/global/networks/${var.spoke_network}"
+  network              = "projects/${var.infra_project_id}/global/networks/${var.hub_network}"
+  peer_network         = "projects/${var.infra_project_id}/global/networks/${var.spoke_network}"
   export_custom_routes = true
   import_custom_routes = true
   depends_on           = [time_sleep.wait_60_seconds, module.vpc-hub]
@@ -124,8 +124,8 @@ resource "google_compute_network_peering" "peering-vpc1-vpc2" {
 
 resource "google_compute_network_peering" "peering-vpc2-vpc1" {
   name                 = "peering-${var.spoke_network}-${var.hub_network}"
-  network              = "projects/${var.project_id}/global/networks/${var.spoke_network}"
-  peer_network         = "projects/${var.project_id}/global/networks/${var.hub_network}"
+  network              = "projects/${var.infra_project_id}/global/networks/${var.spoke_network}"
+  peer_network         = "projects/${var.infra_project_id}/global/networks/${var.hub_network}"
   export_custom_routes = true
   import_custom_routes = true
   depends_on           = [time_sleep.wait_60_seconds, module.vpc-hub]
@@ -134,7 +134,7 @@ resource "google_compute_network_peering" "peering-vpc2-vpc1" {
 # NAT for GitHub Enterprise Server to access image
 module "cldnat-ghes" {
   source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v36.0.0"
-  project_id     = var.project_id
+  project_id     = var.infra_project_id
   region         = var.region_infra
   name           = "${var.cldnat_name}-${var.dc_network}"
   router_network = var.dc_network
@@ -144,7 +144,7 @@ module "cldnat-ghes" {
 # GitHub Enterprise Server
 module "dc-ghes-vm" {
   source     = "./modules/ghes-vm"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   ghes_config = merge(var.dc_ghes_config, {
     region = var.region_infra
     zone   = "${var.region_infra}${var.vm_zone_suffix}"
@@ -156,7 +156,7 @@ module "dc-ghes-vm" {
 module "vpn-vpc" {
   count      = var.create_vpcs ? 1 : 0
   source     = "./modules/vpn-vpc"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   vpn_config = merge(var.vpn_config, {
     region = var.region_infra
   })
@@ -166,7 +166,7 @@ module "vpn-vpc" {
 # Windows Bastion host for testing
 module "win_bastion_vm" {
   source     = "./modules/windows-bastion-vm"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   bastion_config = merge(var.bastion_config, {
     region = var.region_infra
     zone   = "${var.region_infra}${var.vm_zone_suffix}"
@@ -177,7 +177,7 @@ module "win_bastion_vm" {
 # NAT for GitHub Enterprise Server to access image
 module "cldnat_win_bastion" {
   source         = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/net-cloudnat?ref=v36.0.0"
-  project_id     = var.project_id
+  project_id     = var.infra_project_id
   region         = var.region_infra
   name           = "${var.cldnat_name}-${var.bastion_config.vpc}"
   router_network = var.bastion_config.vpc
@@ -186,7 +186,7 @@ module "cldnat_win_bastion" {
 
 # proxy-only subnet for the load balancers in parts 3 & 4
 resource "google_compute_subnetwork" "proxy-subnet-for-lbs" {
-  project       = var.project_id
+  project       = var.infra_project_id
   name          = var.proxy_only_subnet_name
   ip_cidr_range = var.proxy_only_subnet_cidr
   region        = var.region_infra
@@ -198,7 +198,7 @@ resource "google_compute_subnetwork" "proxy-subnet-for-lbs" {
 
 # NAT and Cloud Router for Internet NEG in part 4
 resource "google_compute_router" "proxy_subnet_nat_router" {
-  project    = var.project_id
+  project    = var.infra_project_id
   name       = "cldrtr-for-proxy-subnet"
   region     = var.region_infra
   network    = var.spoke_network
@@ -206,7 +206,7 @@ resource "google_compute_router" "proxy_subnet_nat_router" {
 }
 
 resource "google_compute_router_nat" "proxy_subnet_nat" {
-  project                            = var.project_id
+  project                            = var.infra_project_id
   name                               = "natgw-proxy-subnet"
   router                             = google_compute_router.proxy_subnet_nat_router.name
   region                             = google_compute_router.proxy_subnet_nat_router.region
@@ -232,7 +232,7 @@ resource "google_compute_router_nat" "proxy_subnet_nat" {
 # ======= Common Components such as Northbound PSC NEG and cert ======= 
 # psc neg Northbound Internal Application Load Balancer
 resource "google_compute_region_network_endpoint_group" "psc_neg_nb" {
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${local.service_type_psc}-nb"
   region                = var.region_infra
   network_endpoint_type = "PRIVATE_SERVICE_CONNECT"
@@ -245,7 +245,7 @@ resource "google_compute_region_network_endpoint_group" "psc_neg_nb" {
 # cert for Northbound Internal Application Load Balancer
 resource "google_compute_region_ssl_certificate" "cert" {
   count       = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project     = var.project_id
+  project     = var.infra_project_id
   region      = var.region_infra
   name_prefix = "cert-${var.svc_name}-nb"
   description = ""
@@ -265,7 +265,7 @@ resource "google_compute_region_ssl_certificate" "cert" {
 # create static internal IP address used to reach the load balancer
 resource "google_compute_address" "lb-static-ip" {
   count        = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project      = var.project_id
+  project      = var.infra_project_id
   region       = var.region_infra
   name         = "${var.lb_static_ip_name_prefix}-${var.lb_name}"
   address_type = "INTERNAL"
@@ -277,7 +277,7 @@ resource "google_compute_address" "lb-static-ip" {
 # backend service for Northbound Internal Application Load Balancer
 resource "google_compute_region_backend_service" "backend-service" {
   count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${var.backend_service_name_prefix}-${var.lb_name}"
   region                = var.region_infra
   protocol              = "HTTPS"
@@ -295,7 +295,7 @@ resource "google_compute_region_backend_service" "backend-service" {
 # url map for Northbound Internal Application Load Balancer
 resource "google_compute_region_url_map" "url-map" {
   count           = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project         = var.project_id
+  project         = var.infra_project_id
   name            = var.lb_name
   region          = var.region_infra
   default_service = google_compute_region_backend_service.backend-service[0].id
@@ -305,7 +305,7 @@ resource "google_compute_region_url_map" "url-map" {
 # https proxy for Northbound Internal Application Load Balancer
 resource "google_compute_region_target_https_proxy" "proxy-https" {
   count            = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project          = var.project_id
+  project          = var.infra_project_id
   name             = "${var.lb_https_proxy_name_prefix}-${var.lb_name}"
   region           = var.region_infra
   url_map          = google_compute_region_url_map.url-map[0].id
@@ -316,7 +316,7 @@ resource "google_compute_region_target_https_proxy" "proxy-https" {
 # https forwarding rule for Northbound Internal Application Load Balancer 
 resource "google_compute_forwarding_rule" "forwarding-rule-https" {
   count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${var.forwarding_rule_name_prefix}-https-${var.lb_name}"
   region                = var.region_infra
   ip_protocol           = "TCP"
@@ -333,7 +333,7 @@ resource "google_compute_forwarding_rule" "forwarding-rule-https" {
 module "private-dns" {
   count      = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   source     = "github.com/terraform-google-modules/cloud-foundation-fabric//modules/dns?ref=v36.0.0"
-  project_id = var.project_id
+  project_id = var.infra_project_id
   name       = replace(var.svc_dns_domain, ".", "-")
   zone_config = {
     domain = "${var.svc_dns_domain}."
@@ -355,7 +355,7 @@ module "private-dns" {
 # static external IP address for Northbound External Application Load Balancer
 resource "google_compute_address" "lb-static-ip-ext" {
   count        = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project      = var.project_id
+  project      = var.infra_project_id
   region       = var.region_infra
   name         = "${var.lb_static_ip_name_prefix}-${var.lb_name}-ext"
   address_type = "EXTERNAL"
@@ -367,7 +367,7 @@ resource "google_compute_address" "lb-static-ip-ext" {
 resource "google_compute_region_security_policy" "cloudarmor-policy" {
   count    = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   provider = google-beta
-  project  = var.project_id
+  project  = var.infra_project_id
   region   = var.region_infra
   name     = "${var.cloudarmor_policy_name_prefix}-${var.lb_name}"
   type     = "CLOUD_ARMOR"
@@ -400,7 +400,7 @@ resource "google_compute_region_security_policy" "cloudarmor-policy" {
 resource "google_compute_region_backend_service" "backend-service-ext" {
   count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
   provider              = google-beta
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${var.backend_service_name_prefix}-${var.lb_name}-ext"
   region                = var.region_infra
   protocol              = "HTTPS"
@@ -419,7 +419,7 @@ resource "google_compute_region_backend_service" "backend-service-ext" {
 # url map for Northbound External Application Load Balancer
 resource "google_compute_region_url_map" "url-map-ext" {
   count           = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project         = var.project_id
+  project         = var.infra_project_id
   name            = "${var.lb_name}-ext"
   region          = var.region_infra
   default_service = google_compute_region_backend_service.backend-service-ext[0].id
@@ -429,7 +429,7 @@ resource "google_compute_region_url_map" "url-map-ext" {
 # https proxy for Northbound External Application Load Balancer
 resource "google_compute_region_target_https_proxy" "proxy-https-ext" {
   count            = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project          = var.project_id
+  project          = var.infra_project_id
   name             = "${var.lb_https_proxy_name_prefix}-${var.lb_name}-ext"
   region           = var.region_infra
   url_map          = google_compute_region_url_map.url-map-ext[0].id
@@ -440,7 +440,7 @@ resource "google_compute_region_target_https_proxy" "proxy-https-ext" {
 # https forwarding rule for Northbound External Application Load Balancer
 resource "google_compute_forwarding_rule" "forwarding-rule-https-ext" {
   count                 = var.cert_private_key_path != "" && var.cert_path != "" ? 1 : 0
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${var.forwarding_rule_name_prefix}-https-${var.lb_name}-ext"
   region                = var.region_infra
   ip_protocol           = "TCP"
@@ -458,7 +458,7 @@ resource "google_compute_forwarding_rule" "forwarding-rule-https-ext" {
 
 # backend service for Northbound Internal TCP Proxy Load Balancer without cert
 resource "google_compute_region_backend_service" "bes" {
-  project                         = var.project_id
+  project                         = var.infra_project_id
   name                            = "${var.lb_name}-tcp"
   region                          = var.region_infra
   protocol                        = "TCP"
@@ -477,7 +477,7 @@ resource "google_compute_region_backend_service" "bes" {
 
 # tcp proxy for Northbound Internal TCP Proxy Load Balancer without cert
 resource "google_compute_region_target_tcp_proxy" "tcp_proxy" {
-  project         = var.project_id
+  project         = var.infra_project_id
   name            = "${var.lb_tcp_proxy_name_prefix}-${var.lb_name}"
   region          = var.region_infra
   backend_service = google_compute_region_backend_service.bes.id
@@ -486,7 +486,7 @@ resource "google_compute_region_target_tcp_proxy" "tcp_proxy" {
 
 # static internal IP address for Northbound Internal TCP Proxy Load Balancer without cert
 resource "google_compute_address" "lb-static-ip-tcp" {
-  project      = var.project_id
+  project      = var.infra_project_id
   region       = var.region_infra
   name         = "${var.lb_static_ip_name_prefix}-${google_compute_region_target_tcp_proxy.tcp_proxy.name}"
   address_type = "INTERNAL"
@@ -497,7 +497,7 @@ resource "google_compute_address" "lb-static-ip-tcp" {
 
 # https forwarding rule for Northbound Internal TCP Proxy Load Balancer without cert
 resource "google_compute_forwarding_rule" "fr" {
-  project               = var.project_id
+  project               = var.infra_project_id
   ip_address            = google_compute_address.lb-static-ip-tcp.address
   ip_protocol           = "TCP"
   load_balancing_scheme = "INTERNAL_MANAGED"
@@ -519,7 +519,7 @@ resource "google_compute_forwarding_rule" "fr" {
 # == Original NEG and endpoint - Internet NEG
 resource "google_compute_region_network_endpoint_group" "inet_neg" {
   count                 = var.psc_sb_infra_config.service_type == local.service_type_inet ? 1 : 0
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${local.service_type_inet}-sb"
   region                = var.region_infra
   network               = var.vpc_infra
@@ -529,7 +529,7 @@ resource "google_compute_region_network_endpoint_group" "inet_neg" {
 
 resource "google_compute_region_network_endpoint" "inet-ep" {
   count                         = var.psc_sb_infra_config.service_type == local.service_type_inet ? 1 : 0
-  project                       = var.project_id
+  project                       = var.infra_project_id
   region_network_endpoint_group = google_compute_region_network_endpoint_group.inet_neg[0].name
   region                        = var.region_infra
   fqdn                          = var.psc_sb_infra_config.inet_neg_fqdn_host == "" ? var.psc_sb_infra_config.inet_neg_fqdn_domain : "${var.psc_sb_infra_config.inet_neg_fqdn_host}.${var.psc_sb_infra_config.inet_neg_fqdn_domain}"
@@ -540,7 +540,7 @@ resource "google_compute_region_network_endpoint" "inet-ep" {
 # == PSC NEG
 resource "google_compute_region_network_endpoint_group" "psc_neg_sb" {
   count                 = var.psc_sb_infra_config.service_type == local.service_type_psc ? 1 : 0
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "${local.service_type_psc}-sb"
   region                = var.region_infra
   network_endpoint_type = "PRIVATE_SERVICE_CONNECT"
@@ -551,7 +551,7 @@ resource "google_compute_region_network_endpoint_group" "psc_neg_sb" {
 }
 
 resource "google_compute_region_backend_service" "bes_sb" {
-  project                         = var.project_id
+  project                         = var.infra_project_id
   name                            = "${replace(var.lb_name, "nb", "sb")}-tcp"
   region                          = var.region_infra
   protocol                        = "TCP"
@@ -569,7 +569,7 @@ resource "google_compute_region_backend_service" "bes_sb" {
 }
 
 resource "google_compute_region_target_tcp_proxy" "tcp_proxy_sb" {
-  project         = var.project_id
+  project         = var.infra_project_id
   name            = "${var.lb_tcp_proxy_name_prefix}-${replace(var.lb_name, "nb", "sb")}"
   region          = var.region_infra
   backend_service = google_compute_region_backend_service.bes_sb.id
@@ -577,7 +577,7 @@ resource "google_compute_region_target_tcp_proxy" "tcp_proxy_sb" {
 }
 
 resource "google_compute_address" "ip_address_internal" {
-  project      = var.project_id
+  project      = var.infra_project_id
   name         = "psc-sa-lb-forwarding-rule-ip"
   subnetwork   = var.subnet_infra
   address_type = "INTERNAL"
@@ -586,7 +586,7 @@ resource "google_compute_address" "ip_address_internal" {
 }
 
 resource "google_compute_forwarding_rule" "fr_sb" {
-  project               = var.project_id
+  project               = var.infra_project_id
   ip_address            = google_compute_address.ip_address_internal.address
   ip_protocol           = "TCP"
   load_balancing_scheme = "INTERNAL_MANAGED"
@@ -602,7 +602,7 @@ resource "google_compute_forwarding_rule" "fr_sb" {
 
 
 resource "google_compute_subnetwork" "psc_sa_nat_subnet" {
-  project       = var.project_id
+  project       = var.infra_project_id
   name          = "psc-sa-nat-subnet-${var.svc_name}"
   region        = var.region_infra
   network       = var.vpc_infra
@@ -612,7 +612,7 @@ resource "google_compute_subnetwork" "psc_sa_nat_subnet" {
 }
 
 resource "google_compute_service_attachment" "psc_sa_sb" {
-  project               = var.project_id
+  project               = var.infra_project_id
   name                  = "svcattachment-${var.svc_name}-${var.psc_sa_num}"
   region                = var.region_infra
   enable_proxy_protocol = false
@@ -626,23 +626,25 @@ resource "google_compute_service_attachment" "psc_sa_sb" {
 
 # ======= Configure Looker to allow the VPC ======= 
 
+/*
 module "gcloud_set_prj" {
   source                 = "terraform-google-modules/gcloud/google"
   version                = "~> 3.5"
   platform               = "linux"
   create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "config set project ${var.project_id}"
+  create_cmd_body        = "config set project ${var.looker_project_id}"
   destroy_cmd_entrypoint = ""
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
 }
+*/
 
 module "gcloud_looker_update_allowed_vpcs" {
   source                 = "terraform-google-modules/gcloud/google"
   version                = "~> 3.5"
   platform               = "linux"
   create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "looker instances update ${var.svc_instance_name} --psc-allowed-vpcs ${local.vpc_uri} --region ${var.region_infra} --quiet"
+  create_cmd_body        = "looker instances update ${var.svc_instance_name} --psc-allowed-vpcs ${local.vpc_uri} --region ${var.region_infra} --project ${var.looker_project_id} --quiet"
   destroy_cmd_entrypoint = ""
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
@@ -653,18 +655,20 @@ module "gcloud_looker_update_svc_attachment_uri" {
   version                = "~> 3.5"
   platform               = "linux"
   create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --psc-service-attachment domain=${var.psc_sb_infra_config.inet_neg_fqdn_domain},attachment=${google_compute_service_attachment.psc_sa_sb.self_link} --quiet"
+  create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --psc-service-attachment domain=${var.psc_sb_infra_config.inet_neg_fqdn_domain},attachment=${google_compute_service_attachment.psc_sa_sb.self_link} --project ${var.looker_project_id} --quiet"
   destroy_cmd_entrypoint = ""
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
 }
 
+
 module "gcloud_looker_update_nb_custom_domain" {
+  count                  = var.set_looker_custom_domain ? 1 : 0
   source                 = "terraform-google-modules/gcloud/google"
   version                = "~> 3.5"
   platform               = "linux"
   create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --custom-domain=${var.svc_name}.${var.svc_dns_domain} --quiet"
+  create_cmd_body        = "looker instances update ${var.svc_instance_name} --region ${var.region_infra} --custom-domain=${var.svc_name}.${var.svc_dns_domain} --project ${var.looker_project_id} --quiet"
   destroy_cmd_entrypoint = ""
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
