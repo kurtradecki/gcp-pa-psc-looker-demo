@@ -17,7 +17,7 @@
 locals {
   boolorgpols_map   = { for index, boolorgpol in var.boolorgpols : "${index}" => boolorgpol }
   listorgpols_map   = { for index, listorgpol in var.listorgpols : "${index}" => listorgpol }
-  vpc_uri           = "projects/${var.project_id}/global/networks/${var.vpc_infra}"
+  vpc_uri           = "projects/${var.looker_project_id}/global/networks/${var.vpc_infra}"
   service_type_psc  = "psc-neg"
   service_type_inet = "inet-neg"
 }
