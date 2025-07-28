@@ -23,7 +23,7 @@
 # ===== Section 1 - Add values here =====
 infra_project_id  = "" # project where infrastructure such as load balancers will be built
 looker_project_id = "" # can be the same as project_id or a project ID for a different project
-svc_instance_name = "" # name of the service instance 
+svc_instance_name = "" # name of the service instance (Looker Core instance name)
 svc_sa            = "" # service instance PSC service attachment
 svc_dns_domain    = "" # domain in service instance's FQDN
 svc_name          = "" # the name of the service instance (Looker Core instance name), and also the host in the service instance's FQDN, or empty quotes "" if no host
