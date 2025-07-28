@@ -26,7 +26,7 @@ looker_project_id = "" # can be the same as project_id or a project ID for a dif
 svc_instance_name = "" # name of the service instance 
 svc_sa            = "" # service instance PSC service attachment
 svc_dns_domain    = "" # domain in service instance's FQDN
-svc_name          = "" # host in the service instance's FQDN, or empty quotes "" if not host
+svc_name          = "" # the name of the service instance (Looker Core instance name), and also the host in the service instance's FQDN, or empty quotes "" if no host
 region_infra      = "" # match this to Looker Core's region
 
 # ===== Section 1.1 - Add values if needed to enable / disable functionality
