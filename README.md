@@ -86,6 +86,7 @@ Option 2 - An external load balancer is deployed in this option, along with 2 in
 **Verify Southbound**\
 
 
+
 ## Troubleshooting
 
 **Terraform script errors**\
