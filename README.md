@@ -70,6 +70,16 @@ terraform apply -auto-approve
 ```
 8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.\
 Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete", from [Create a custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2).
+9. If Northbound Option 2 is implemented, DNS entry needs to be created / updated to point to the IP address of the External Application Load Balancer. To find Load Balancer's IP address, run these commands: 
+```
+gcloud config set project <infra_project_id>
+gcloud compute addresses describe static-ip-lb-psc-looker-nb-ext --region=<region_infra> | grep address
+```
+...or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note:
+* In the `gcloud config set project` command above, set the `project` to the value of infra_project_id in the terraform.tfvars file.
+* In the `gcloud compute addresses describe` command above, set the `--region=` to the value of region_infra in the terraform.tfvars file. 
+* If you changed any of the default names in your terraform.tfvars file (section 2), the address name could be different, made of the values of lb_static_ip_name_prefix, lb_name, and "ext" with a dash in between each.
+
 
 ## Verify the setup
 
@@ -84,7 +94,7 @@ gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb --region=
 ...or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note:
 * In the `gcloud config set project` command above, set the `project` to the value of infra_project_id in the terraform.tfvars file.
 * In the `gcloud compute addresses describe` command above, set the `--region=` to the value of region_infra in the terraform.tfvars file. 
-* If you changed any of the default names in your terraform.tfvars file (section 2), the name could be different, made of the values of lb_static_ip_name_prefix, lb_tcp_proxy_name_prefix and lb_name with a dash in between each.
+* If you changed any of the default names in your terraform.tfvars file (section 2), the address name could be different, made of the values of lb_static_ip_name_prefix, lb_tcp_proxy_name_prefix and lb_name with a dash in between each.
 
 Option 2 - An external load balancer is deployed in this option, along with 2 internal load balancers, so there are a variety of ways to connect:
 1. Same as in Option 1.
@@ -103,7 +113,7 @@ Most errors in this Terraform script can be cleared by running the `terraform pl
 This script includes gcloud commands in the Terraform script. In general, gcloud commands in a Terraform script can at times return a long error message that includes the following error: "local-exec provisioner error" and "unable to queue operation since queue fifo_queue is full according to queue". Same as mentioned, re-running the terraform commands `terraform plan` and `terraform apply -auto-approve` will clear the error. 
 
 **DNS for External application load balancer**\
-To operate, the External application load balancer requires DNS to be updated for the FQDN (svc_name & svc_dns_domain) to resolved to the external IP address of the forwarding rule. 
+To operate, the External application load balancer requires DNS to be updated for the FQDN (svc_name & svc_dns_domain) to resolved to the external IP address of the forwarding rule. See above under Setup and Deploy the script for how to find the IP address. 
 
 
 ## Conclusion & Cleanup
