@@ -84,7 +84,7 @@ Option 2 - An external load balancer is deployed in this option, along with 2 in
 3. Connect to the external load balancer from your local machine's browser (no need to RDP to the Bastion Host) over HTTPS via the FQDN, eg https://looker.example.com.
 
 **Verify Southbound**\
-
+Instructions coming soon.
 
 
 ## Troubleshooting
