@@ -73,7 +73,7 @@ Note: Most of the time for the script to run is updating Looker Core custom doma
 9. If Northbound Option 2 is implemented, DNS entry needs to be created / updated to point to the IP address of the External Application Load Balancer. To find Load Balancer's IP address, run these commands: 
 ```
 gcloud config set project <infra_project_id>
-gcloud compute addresses describe static-ip-lb-psc-looker-nb-ext --region=<region_infra> | grep address
+gcloud compute addresses describe static-ip-lb-psc-looker-nb-ext --region=<region_infra> | grep address:
 ```
 ...or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note:
 * In the `gcloud config set project` command above, set the `project` to the value of infra_project_id in the terraform.tfvars file.
@@ -89,7 +89,7 @@ The options to verify the connection from a client to Looker (Northbound) depend
 Option 1 - Connect to the Bastion Host via RDP using [IAP for TCP Forwarding](https://cloud.google.com/iap/docs/using-tcp-forwarding). From a browser on the Bastion Host, connect to the Internal Network Proxy (TCP Proxy) Load Balancer over HTTP (not HTTPS) via the IP address, eg http://1.2.3.4. To find Load Balancer's IP address, run these commands: 
 ```
 gcloud config set project <infra_project_id>
-gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb --region=<region_infra> | grep address
+gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb --region=<region_infra> | grep address:
 ```
 ...or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note:
 * In the `gcloud config set project` command above, set the `project` to the value of infra_project_id in the terraform.tfvars file.
