@@ -113,7 +113,7 @@ Most errors in this Terraform script can be cleared by running the `terraform pl
 This script includes gcloud commands in the Terraform script. In general, gcloud commands in a Terraform script can at times return a long error message that includes the following error: "local-exec provisioner error" and "unable to queue operation since queue fifo_queue is full according to queue". Same as mentioned, re-running the terraform commands `terraform plan` and `terraform apply -auto-approve` will clear the error. 
 
 **DNS for External application load balancer**\
-To operate, the External application load balancer requires DNS to be updated for the FQDN (svc_name & svc_dns_domain) to resolved to the external IP address of the forwarding rule. See above under Setup and Deploy the script for how to find the IP address. 
+To operate, the External application load balancer requires DNS to be updated for the FQDN (svc_name & svc_dns_domain) to resolved to the external IP address of the forwarding rule. See above under Setup and Deploy the script for how to find the IP address. Updates to public DNS records can take time to propagate, so before testing the connection to the External Application Load Balancer, verify that the DNS change has been propagated so that it is visible to your machine using `nslookup <FQDN>` where FDQN is the host + domain, eg looker.example.com.
 
 
 ## Conclusion & Cleanup
