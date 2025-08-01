@@ -78,11 +78,12 @@ The options to verify the connection from a client to Looker (Northbound) depend
 
 Option 1 - Connect to the Bastion Host via RDP using [IAP for TCP Forwarding](https://cloud.google.com/iap/docs/using-tcp-forwarding). From a browser on the Bastion Host, connect to the Internal Network Proxy (TCP Proxy) Load Balancer over HTTP (not HTTPS) via the IP address, eg http://1.2.3.4. To find Load Balancer's IP address, run these commands: 
 ```
-gcloud config set project <project_id>
-gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb --region=<region> | grep address
+gcloud config set project <infra_project_id>
+gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb --region=<region_infra> | grep address
 ```
 ...or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note:
-* In the `gcloud compute addresses describe` command above, match the region in `--region=` to whatever is in the terraform.tfvars file for the region_infra variable. 
+* In the `gcloud config set project` command above, set the `project` to the value of infra_project_id in the terraform.tfvars file.
+* In the `gcloud compute addresses describe` command above, set the `--region=` to the value of region_infra in the terraform.tfvars file. 
 * If you changed any of the default names in your terraform.tfvars file (section 2), the name could be different, made of the values of lb_static_ip_name_prefix, lb_tcp_proxy_name_prefix and lb_name with a dash in between each.
 
 Option 2 - An external load balancer is deployed in this option, along with 2 internal load balancers, so there are a variety of ways to connect:
