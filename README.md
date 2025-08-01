@@ -71,6 +71,21 @@ terraform apply -auto-approve
 8. Wait a 15-20 minutes for the script to complete (setting Looker custom domain takes 10-15 minutes). You'll see a message similar to "Apply complete!" and then move to the next section.\
 Note: Most of the time for the script to run is updating Looker Core custom domain which "takes 10 to 15 minutes to complete", from [Create a custom domain](https://cloud.google.com/looker/docs/looker-core-psc-access#create_a_custom_domain_2).
 
+## Verify the setup
+
+**Verify Northbound**\
+The options to verify the connection from a client to Looker (Northbound) depends on which Northbound option was deployed:
+
+Option 1 - Connect to the Bastion Host via RDP using [IAP for TCP Forwarding](https://cloud.google.com/iap/docs/using-tcp-forwarding). From a browser on the Bastion Host, connect to the Internal Network Proxy (TCP Proxy) Load Balancer over HTTP (not HTTPS) via the IP address, eg http://1.2.3.4. To find Load Balancer's IP address, run this command: `gcloud compute addresses describe static-ip-tcp-proxy-lb-psc-looker-nb | grep address` or go to the GCP Console under VPC Network > IP Addresses and search for the static IP with the name static-ip-tcp-proxy-lb-psc-looker-nb. Note, if you changed any of the default names in your terraform.tfvars file, the name could be different, made of the values of lb_static_ip_name_prefix, lb_tcp_proxy_name_prefix and lb_name with a dash in between each.
+
+Option 2 - An external load balancer is deployed in this option, along with 2 internal load balancers, so there are a variety of ways to connect:
+1. Same as in Option 1.
+2. RDP to the Bastion Host as in Option 1 and connect over HTTPS via the FQDN, eg https://looker.example.com.
+3. Connect to the external load balancer from your local machine's browser (no need to RDP to the Bastion Host) over HTTPS via the FQDN, eg https://looker.example.com.
+
+**Verify Southbound**\
+
+
 ## Troubleshooting
 
 **Terraform script errors**\
