@@ -41,9 +41,6 @@ subnet_infra             = "subnet-spoke" # name of subnet where Northbound and 
 
 
 # ===== Section 2 - No need to change - customize below only if needed (see note above) =====
-vpc_infra                     = "vpc-spoke"             # name of VPC where Northbound and Southbound infrastructure will be created, could also be vpc-hub - a VPC name from variables below
-subnet_infra                  = "subnet-spoke" # name of subnet where Northbound and Southbound infrastructure (for resources the leverage a subnet) - a subnet name from variables below
-region_infra                  = "us-east1"              # match this to the region of the subnet named in the variable above, subnet_infra
 lb_name                       = "lb-psc-looker-nb"      # becomes the load balancer name for an application load balancer
 cert_name_prefix              = "cert"
 lb_static_ip_name_prefix      = "static-ip"
