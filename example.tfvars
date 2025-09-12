@@ -21,27 +21,27 @@
 #  If you plan to customize, you'll need Terraform experience.
 
 # ===== Section 1 - Add values here =====
-infra_project_id  = "" # project where infrastructure such as load balancers will be built
-looker_project_id = "" # can be the same as project_id or a project ID for a different project
-svc_instance_name = "" # name of the service instance (Looker Core instance name)
-svc_sa            = "" # service instance PSC service attachment
-svc_dns_domain    = "" # domain in service instance's FQDN
-svc_name          = "" # the name of the service instance (Looker Core instance name), and also the host in the service instance's FQDN, or empty quotes "" if no host
-region_infra      = "" # match this to Looker Core's region
+infra_project_id  = "prj-infra-ice-looker-testing"
+looker_project_id = "prj-ice-looker-testing" # can be the same as project_id
+svc_instance_name = "looker-psc-ssm" # name of the service instance 
+svc_sa            = "projects/ncf4901213b0badbdp-tp/regions/us-central1/serviceAttachments/looker-psc-1a37babf-6807-4896-bf84-bfa40ea9366d" # service instance PSC service attachment
+svc_dns_domain    = "krgcplab.org" # domain used by the service instance
+svc_name          = "looker" # also becomes host in the service's FQDN
+region_infra      = "us-central1" # match this to Looker Core's region
 
 # ===== Section 1.1 - Add values if needed to enable / disable functionality
-set_looker_custom_domain = true # if there is already a custom domain for Looker, make this value false, otherwise true to configure the custom domain in Looker
-cert_private_key_path    = "" # leave as empty string if not using a cert
-cert_path                = "" # leave as empty string if not using a cert
-ext_allowed_ips          = ["0.0.0.0/32"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
-psc_sa_num               = "1" # used to quickly change the name of the Southbound PSC Service Attachment
+set_looker_custom_domain = false # if there is already a custom domain for Looker, make value false, otherwise true to configure the custom domain in Looker
+cert_private_key_path    = "/usr/local/google/home/radecki/tfrm-general/certs/looker.krgcplab.org_key.txt" # leave as empty string if not using a cert
+cert_path                = "/usr/local/google/home/radecki/tfrm-general/certs/looker_krgcplab_org.crt" # leave as empty string if not using a cert
+ext_allowed_ips          = ["0.0.0.0/0"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
+psc_sa_num               = "2" # used to quickly change the name of the Southbound PSC Service Attachment
 vm_zone_suffix           = "-c" # zone suffix, eg -c, to add to the end of the region_infra value
 vpc_infra                = "vpc-spoke" # name of VPC where Northbound and Southbound infrastructure will be created, could also be vpc-hub - a VPC name from variables below
 subnet_infra             = "subnet-spoke" # name of subnet where Northbound and Southbound infrastructure (for resources the leverage a subnet) - a subnet name from variables below
 
 
 # ===== Section 2 - No need to change - customize below only if needed (see note above) =====
-lb_name                       = "lb-psc-looker-nb"      # becomes the load balancer name for an application load balancer
+lb_name                       = "lb-psc-looker-nb" # becomes the load balancer name for an application load balancer
 cert_name_prefix              = "cert"
 lb_static_ip_name_prefix      = "static-ip"
 cloudarmor_policy_name_prefix = "cldarmr-pol"
@@ -63,10 +63,9 @@ vpn_config = {
 }
 
 bastion_config = {
-  zone      = "us-east1-d"
   vm_name   = "windows-srvr-2022-bastion"
   vpc       = "vpc-spoke"
-  subnet    = "subnet-spoke-us-east1"
+  subnet    = "subnet-spoke"
   fw_name   = "allow-iap-rdp-to-bastion"
   fw_ranges = ["35.235.240.0/20"]
 }
@@ -74,18 +73,16 @@ bastion_config = {
 ghes_config = {
   diskname         = "ghes-disk"
   vpcname          = "vpc-spoke"
-  subnetname       = "subnet-spoke-us-east1"
+  subnetname       = "subnet-spoke"
   githubservername = "ghes-vm"
-  zone             = "us-east1-b"
   #  instancegroupname = "instance-group-1"
 }
 
 dc_ghes_config = {
   diskname         = "dc-ghes-disk"
   vpcname          = "vpc-dc"
-  subnetname       = "subnet-dc-us-east1"
+  subnetname       = "subnet-dc"
   githubservername = "dc-ghes-vm"
-  zone             = "us-east1-b"
   #  instancegroupname = "instance-group-1"
 }
 
@@ -103,7 +100,7 @@ psc_sb_infra_config = {
 # VPCs / subnets config
 spoke_network = "vpc-spoke"
 spoke_subnets = {
-  name               = "subnet-spoke-us-east1"
+  name               = "subnet-spoke"
   ip_cidr_range      = "10.101.1.0/24"
   secondary_ip_range = null
   flow_logs_config = {
@@ -116,7 +113,7 @@ spoke_subnets = {
 
 hub_network = "vpc-hub"
 hub_subnets = {
-  name               = "subnet-hub-us-east1"
+  name               = "subnet-hub"
   ip_cidr_range      = "10.11.1.0/24"
   secondary_ip_range = null
   flow_logs_config = {
@@ -128,7 +125,7 @@ hub_subnets = {
 
 dc_network = "vpc-dc"
 dc_subnets = {
-  name               = "subnet-dc-us-east1"
+  name               = "subnet-dc"
   ip_cidr_range      = "172.17.1.0/24"
   secondary_ip_range = null
   flow_logs_config = {
