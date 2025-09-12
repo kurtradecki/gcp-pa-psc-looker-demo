@@ -30,7 +30,7 @@ svc_name          = "" # also becomes host in the service's FQDN
 region_infra      = "" # match this to Looker Core's region
 
 # ===== Section 1.1 - Add values if needed to enable / disable functionality
-set_looker_custom_domain = false # if there is already a custom domain for Looker, make value false, otherwise true to configure the custom domain in Looker
+set_looker_custom_domain = true # if there is already a custom domain for Looker, make value false, otherwise true to configure the custom domain in Looker
 cert_private_key_path    = "/usr/local/google/home/radecki/tfrm-general/certs/looker.krgcplab.org_key.txt" # leave as empty string if not using a cert
 cert_path                = "/usr/local/google/home/radecki/tfrm-general/certs/looker_krgcplab_org.crt" # leave as empty string if not using a cert
 ext_allowed_ips          = ["0.0.0.0/0"] # eg ["1.2.3.4/32","5.6.7.0/24"] - must have at least 1 string value in the list - Public IP range(s) allowed in Cloud Armor for external LB, leave as is to deny all external IPs to reach the external load balancer. Visit https://whatismyipaddress.com/ or other sites like it to get your public IP address.
