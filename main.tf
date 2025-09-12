@@ -618,7 +618,7 @@ resource "google_compute_service_attachment" "psc_sa_sb" {
   enable_proxy_protocol = false
   connection_preference = "ACCEPT_AUTOMATIC"
   nat_subnets           = [google_compute_subnetwork.psc_sa_nat_subnet.id]
-  target_service        = google_compute_forwarding_rule.fr.id
+  target_service        = google_compute_forwarding_rule.fr_sb.id
   depends_on            = [time_sleep.wait_60_seconds]
 }
 
@@ -650,6 +650,7 @@ module "gcloud_looker_update_allowed_vpcs" {
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
 }
 
+/*
 module "gcloud_looker_update_svc_attachment_uri" {
   source                 = "terraform-google-modules/gcloud/google"
   version                = "~> 3.5"
@@ -660,7 +661,7 @@ module "gcloud_looker_update_svc_attachment_uri" {
   destroy_cmd_body       = ""
   module_depends_on      = [google_compute_forwarding_rule.fr_sb]
 }
-
+*/
 
 module "gcloud_looker_update_nb_custom_domain" {
   count                  = var.set_looker_custom_domain ? 1 : 0
