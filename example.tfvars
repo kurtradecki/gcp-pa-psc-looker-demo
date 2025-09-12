@@ -21,13 +21,13 @@
 #  If you plan to customize, you'll need Terraform experience.
 
 # ===== Section 1 - Add values here =====
-infra_project_id  = "prj-infra-ice-looker-testing"
-looker_project_id = "prj-ice-looker-testing" # can be the same as project_id
-svc_instance_name = "looker-psc-ssm" # name of the service instance 
-svc_sa            = "projects/ncf4901213b0badbdp-tp/regions/us-central1/serviceAttachments/looker-psc-1a37babf-6807-4896-bf84-bfa40ea9366d" # service instance PSC service attachment
-svc_dns_domain    = "krgcplab.org" # domain used by the service instance
-svc_name          = "looker" # also becomes host in the service's FQDN
-region_infra      = "us-central1" # match this to Looker Core's region
+infra_project_id  = ""
+looker_project_id = "" # can be the same as project_id
+svc_instance_name = "" # name of the service instance 
+svc_sa            = "" # service instance PSC service attachment
+svc_dns_domain    = "" # domain used by the service instance
+svc_name          = "" # also becomes host in the service's FQDN
+region_infra      = "" # match this to Looker Core's region
 
 # ===== Section 1.1 - Add values if needed to enable / disable functionality
 set_looker_custom_domain = false # if there is already a custom domain for Looker, make value false, otherwise true to configure the custom domain in Looker
